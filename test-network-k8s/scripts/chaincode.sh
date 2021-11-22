@@ -111,10 +111,27 @@ function query_chaincode_metadata() {
   set -x
   local args='{"Args":["org.hyperledger.fabric:GetMetadata"]}'
   # todo: mangle additional $@ parameters with bash escape quotations
+  log 'Org1-Peer1:'
   echo '
   export CORE_PEER_ADDRESS=org1-peer1:7051
   peer chaincode query -n '${CHAINCODE_NAME}' -C '${CHANNEL_NAME}' -c '"'$args'"'
   ' | exec kubectl -n $NS exec deploy/org1-admin-cli -c main -i -- /bin/bash
+
+  log ''
+  log 'Org1-Peer2:'
+  echo '
+  export CORE_PEER_ADDRESS=org1-peer2:7051
+  peer chaincode query -n '${CHAINCODE_NAME}' -C '${CHANNEL_NAME}' -c '"'$args'"'
+  ' | exec kubectl -n $NS exec deploy/org1-admin-cli -c main -i -- /bin/bash
+
+  log ''
+  log 'Org1-Peer-SVC:'
+  echo '
+  export CORE_PEER_ADDRESS=org1-peer-svc:7051
+  peer chaincode query -n '${CHAINCODE_NAME}' -C '${CHANNEL_NAME}' -c '"'$args'"'
+  ' | exec kubectl -n $NS exec deploy/org1-admin-cli -c main -i -- /bin/bash
+
+
 }
 
 function invoke_chaincode() {
@@ -137,7 +154,8 @@ function invoke_chaincode() {
 # Normally the chaincode ID is emitted by the peer install command.  In this case, we'll generate the
 # package ID as the sha-256 checksum of the chaincode archive.
 function set_chaincode_id() {
-  local cc_sha256=$(shasum -a 256 build/chaincode/${CHAINCODE_NAME}.tgz | tr -s ' ' | cut -d ' ' -f 1)
+  local cc_package=build/chaincode/${CHAINCODE_NAME}.tgz
+  cc_sha256=$(shasum -a 256 ${cc_package} | tr -s ' ' | cut -d ' ' -f 1)
 
   CHAINCODE_ID=${CHAINCODE_LABEL}:${cc_sha256}
 }

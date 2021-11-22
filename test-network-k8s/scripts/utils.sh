@@ -17,6 +17,9 @@ function logging_init() {
 
   # Send stdout and stderr from child programs to the debug log file
   exec 1>>${DEBUG_FILE} 2>>${DEBUG_FILE}
+
+  # There can be a race between the tail starting and the next log statement
+  sleep 0.5
 }
 
 function exit_fn() {
@@ -44,17 +47,23 @@ function log() {
 function pop_fn() {
 #  echo exiting ${FUNCNAME[1]}
 
-  local res=$1
   if [ $# -eq 0 ]; then
     echo -ne "\r✅"  >> ${LOG_FILE}
+    echo "" >> ${LOG_FILE}
+    return
+  fi
 
-  elif [ $res -eq 0 ]; then
+  local res=$1
+  if [ $res -eq 0 ]; then
     echo -ne "\r✅"  >> ${LOG_FILE}
 
   elif [ $res -eq 1 ]; then
     echo -ne "\r⚠️" >> ${LOG_FILE}
 
   elif [ $res -eq 2 ]; then
+    echo -ne "\r☠️" >> ${LOG_FILE}
+
+  elif [ $res -eq 127 ]; then
     echo -ne "\r☠️" >> ${LOG_FILE}
 
   else

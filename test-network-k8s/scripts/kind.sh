@@ -8,12 +8,27 @@
 function pull_docker_images() {
   push_fn "Pulling docker images for Fabric ${FABRIC_VERSION}"
 
-  docker pull hyperledger/fabric-ca:$FABRIC_CA_VERSION
-  docker pull hyperledger/fabric-orderer:$FABRIC_VERSION
-  docker pull hyperledger/fabric-peer:$FABRIC_VERSION
-  docker pull hyperledger/fabric-tools:$FABRIC_VERSION
+  docker pull ${FABRIC_CONTAINER_REGISTRY}/fabric-ca:$FABRIC_CA_VERSION
+  docker pull ${FABRIC_CONTAINER_REGISTRY}/fabric-orderer:$FABRIC_VERSION
+  docker pull ${FABRIC_CONTAINER_REGISTRY}/fabric-peer:$FABRIC_VERSION
+  docker pull ${FABRIC_CONTAINER_REGISTRY}/fabric-tools:$FABRIC_VERSION
+  docker pull ghcr.io/hyperledgendary/fabric-ccs-builder:latest
+  docker pull ghcr.io/hyperledgendary/fabric-ccaas-asset-transfer-basic:latest
 
   pop_fn
+}
+
+function load_docker_images() {
+  push_fn "Loading docker images to KIND control plane"
+
+  kind load docker-image ${FABRIC_CONTAINER_REGISTRY}/fabric-ca:$FABRIC_CA_VERSION
+  kind load docker-image ${FABRIC_CONTAINER_REGISTRY}/fabric-orderer:$FABRIC_VERSION
+  kind load docker-image ${FABRIC_CONTAINER_REGISTRY}/fabric-peer:$FABRIC_VERSION
+  kind load docker-image ${FABRIC_CONTAINER_REGISTRY}/fabric-tools:$FABRIC_VERSION
+  kind load docker-image ghcr.io/hyperledgendary/fabric-ccs-builder:latest
+  kind load docker-image ghcr.io/hyperledgendary/fabric-ccaas-asset-transfer-basic:latest
+  
+  pop_fn 
 }
 
 function apply_nginx_ingress() {
@@ -34,10 +49,12 @@ function kind_create() {
   # todo: always delete?  Maybe return no-op if the cluster already exists?
   kind delete cluster --name $CLUSTER_NAME
 
-  local reg_name=${CONTAINER_REGISTRY_NAME}
-  local reg_port=${CONTAINER_REGISTRY_PORT}
+  local reg_name=${LOCAL_REGISTRY_NAME}
+  local reg_port=${LOCAL_REGISTRY_PORT}
   local ingress_http_port=${NGINX_HTTP_PORT}
   local ingress_https_port=${NGINX_HTTPS_PORT}
+
+  # the 'ipvs'proxy mode permits better HA abilities
 
   cat <<EOF | kind create cluster --name $CLUSTER_NAME --config=-
 ---
@@ -58,6 +75,8 @@ nodes:
       - containerPort: 443
         hostPort: ${ingress_https_port}
         protocol: TCP
+networking:
+  kubeProxyMode: "ipvs"
 
 # create a cluster with the local registry enabled in containerd
 containerdConfigPatches:
@@ -71,11 +90,11 @@ EOF
 }
 
 function launch_docker_registry() {
-  push_fn "Launching container registry \"${CONTAINER_REGISTRY_NAME}\" at localhost:${CONTAINER_REGISTRY_PORT}"
+  push_fn "Launching container registry \"${LOCAL_REGISTRY_NAME}\" at localhost:${LOCAL_REGISTRY_PORT}"
 
   # create registry container unless it already exists
-  local reg_name=${CONTAINER_REGISTRY_NAME}
-  local reg_port=${CONTAINER_REGISTRY_PORT}
+  local reg_name=${LOCAL_REGISTRY_NAME}
+  local reg_port=${LOCAL_REGISTRY_PORT}
 
   running="$(docker inspect -f '{{.State.Running}}' "${reg_name}" 2>/dev/null || true)"
   if [ "${running}" != 'true' ]; then
@@ -106,11 +125,6 @@ EOF
   pop_fn
 }
 
-function load_kind_image_plane() {
-  push_fn "Ensuring fabric node images"
-  pop_fn
-}
-
 function kind_delete() {
   push_fn "Deleting KIND cluster ${CLUSTER_NAME}"
 
@@ -123,10 +137,14 @@ function kind_init() {
   # todo: how to pass this through to push_fn ?
   set -o errexit
 
-  pull_docker_images
   kind_create
   apply_nginx_ingress
   launch_docker_registry
+
+  if [ "${STAGE_DOCKER_IMAGES}" == true ]; then
+    pull_docker_images 
+    load_docker_images 
+  fi 
 }
 
 function kind_unkind() {
