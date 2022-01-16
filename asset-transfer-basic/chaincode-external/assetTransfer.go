@@ -161,27 +161,20 @@ func (s *SmartContract) AssetExists(ctx contractapi.TransactionContextInterface,
 	return assetJSON != nil, nil
 }
 
-// TransferAsset updates the owner field of asset with given id in world state, and returns the old owner.
-func (s *SmartContract) TransferAsset(ctx contractapi.TransactionContextInterface, id string, newOwner string) (string, error) {
+// TransferAsset updates the owner field of asset with given id in world state.
+func (s *SmartContract) TransferAsset(ctx contractapi.TransactionContextInterface, id string, newOwner string) error {
 	asset, err := s.ReadAsset(ctx, id)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	oldOwner := asset.Owner
 	asset.Owner = newOwner
-
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	err = ctx.GetStub().PutState(id, assetJSON)
-	if err != nil {
-		return "", err
-	}
-
-	return oldOwner, nil
+	return ctx.GetStub().PutState(id, assetJSON)
 }
 
 // GetAllAssets returns all assets found in world state
@@ -230,9 +223,9 @@ func main() {
 	}
 
 	server := &shim.ChaincodeServer{
-		CCID:     config.CCID,
-		Address:  config.Address,
-		CC:       chaincode,
+		CCID:    config.CCID,
+		Address: config.Address,
+		CC:      chaincode,
 		TLSProps: getTLSProperties(),
 	}
 
@@ -272,9 +265,9 @@ func getTLSProperties() shim.TLSProperties {
 	}
 
 	return shim.TLSProperties{
-		Disabled:      tlsDisabled,
-		Key:           keyBytes,
-		Cert:          certBytes,
+		Disabled: tlsDisabled,
+		Key: keyBytes,
+		Cert: certBytes,
 		ClientCACerts: clientCACertBytes,
 	}
 }
@@ -291,7 +284,7 @@ func getEnvOrDefault(env, defaultVal string) string {
 // cannot be parsed!
 func getBoolOrDefault(value string, defaultVal bool) bool {
 	parsed, err := strconv.ParseBool(value)
-	if err != nil {
+	if err!= nil {
 		return defaultVal
 	}
 	return parsed
