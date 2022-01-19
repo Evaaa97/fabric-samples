@@ -43,7 +43,8 @@ let mysql = require('mysql');
 const session = require('express-session');
 var bodyParser = require('body-parser');
 var path = require('path');
-var popup = require('popups');
+const popup = require('node-popup');
+//const popup = require('node-popup/dist/cjs.js');
 
 var flash = require('connect-flash');
 app.use(flash());
