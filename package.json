@@ -12,6 +12,8 @@
         "express-validator": "^6.13.0",
         "flash": "^1.1.0",
         "import": "^0.0.6",
-        "mysql": "^2.18.1"
+        "mysql": "^2.18.1",
+        "popup": "^0.0.3",
+        "popups": "^1.1.3"
     }
 }

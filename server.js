@@ -43,6 +43,7 @@ let mysql = require('mysql');
 const session = require('express-session');
 var bodyParser = require('body-parser');
 var path = require('path');
+var popup = require('popups');
 
 var flash = require('connect-flash');
 app.use(flash());
@@ -190,11 +191,12 @@ app.get('/register', function (req, res) {
 });
 
 app.post('/register', function (request, response) {
+    const name = request.body.name;
     const username = request.body.username;
     const password = request.body.password;
     const email = request.body.email;
 
-    if (username != undefined && password != undefined && email != undefined) {
+    if (username != undefined && password != undefined && email != undefined && name != undefined) {
         conexion.query('SELECT * FROM users WHERE email = ?', [email], function (error, results, fields) {
             console.log(results[0]);
             //console.log(error);
@@ -204,21 +206,25 @@ app.post('/register', function (request, response) {
                 response.send('This email already registered, try to login or try another email');
                 //response.redirect('/register');
                 response.end();
-            }  else { conexion.query('SELECT * FROM users WHERE email = ?', [email], function (error, results, fields) {
+            }  else { conexion.query('INSERT INTO users (name, username, email, password) VALUES (?,?,?,?)', [name, username, email, password], function (error, results, fields) {
                     console.log(results[0]);
                     //console.log(error);
-                    if (results.length > 0) {
-                    
-                        request.flash('error');
-                        response.send('This username already registered, try another user');
-                        //response.redirect('/register');
-                        response.end();
-                    }
+                    popup.alert({
+                        content: 'Register successfull'
+                    });
+                    response.render('pages/welcome', {
+                        username: username,
+                        data: results,
+                    });
+                    response.end();
                 });
             }
         });
     }else {
-        response.send('Please enter Username, Password and Email');
+        popup.alert({
+            content: 'Please enter all the required data'
+        });
+        response.render('pages/welcome');
         response.end();
     }
 });
