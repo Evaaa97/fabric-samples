@@ -197,7 +197,7 @@ app.post('/register', function (request, response) {
     const password = request.body.password;
     const email = request.body.email;
 
-    if (username != undefined && password != undefined && email != undefined && name != undefined) {
+    if (name != undefined && username != undefined && password != undefined && email != undefined) {
         conexion.query('SELECT * FROM users WHERE email = ?', [email], function (error, results, fields) {
             console.log(results[0]);
             //console.log(error);
@@ -207,7 +207,7 @@ app.post('/register', function (request, response) {
                 response.send('This email already registered, try to login or try another email');
                 //response.redirect('/register');
                 response.end();
-            }  else { conexion.query('INSERT INTO users (name, username, email, password) VALUES (?,?,?,?)', [name, username, email, password], function (error, results, fields) {
+            }  else { conexion.query('INSERT INTO users WHERE (name, username, email, password) VALUES (?,?,?,?)', [name, username, email, password], function (error, results, fields) {
                     console.log(results[0]);
                     //console.log(error);
                     popup.alert({
