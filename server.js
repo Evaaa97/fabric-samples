@@ -89,32 +89,33 @@ app.get('/login', function (req, res) {
 
 app.post('/login', function (request, response) {
 
-    const username = request.body.username;
+    const email = request.body.email;
     const password = request.body.password;
+    
+    //const email;
 
-    if (username != undefined && password != undefined) {
-        conexion.query('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], function (error, results, fields) {
+    if (email != undefined && password != undefined) {
+        conexion.query('SELECT * FROM users WHERE email = ? AND password = ?', [email, password], function (error, results, fields) {
 
             if (error) {
-                console.log('La cagaste 1!');
                 throw error;
             }
             console.log(results[0]);
             //console.log(error);
             if (results.length <= 0) {
-                console.log('User/Password incorrect');
+                console.log('Email/Password incorrect');
                 request.flash('error', 'Please correct enter email and Password!');
-                //res.send('User/Password incorrect');
                 response.redirect('/login');
             }             
-            else if (results[0].password == password && results[0].username == username) {
+            else if (results[0].password == password && results[0].email == email) {
                 //req.session.loggedIn = true;
                 //req.session.username = username;
                 //res.send("User OK");
                 console.log('Entraste!');
+                const name = results[0].name;
 
                 response.render('pages/welcome', {
-                    username: username,
+                    name: name,
                     data: results,
                 });
             } else {
@@ -130,57 +131,6 @@ app.post('/login', function (request, response) {
     }
 
 });
-
-/*app.post('/login', function (req, res) {
-
-    const username = req.body.username;
-    const password = res.body.password;
-
-    if (username != undefined && password != undefined) {
-
-        conexion_db.query('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], function (error, results, fields) {
-            console.log('La cagaste 1!');
-            console.log(results[0]);
-            console.log(error);
-            enrollUser.main_enrollUser(username);
-            //User not found
-            if (results.length == 0 && checkUsers(results[0].nombre) == false) {
-                console.log('User/Password incorrect');
-                    req.flash('error', 'User/Password incorrect')
-                    res.render('/sign_in');
-            }
-            else {
-                const hashedPassword = crypto.createHash('sha256').update(password).digest('base64');
-                if (bcrypt.compare(password, hashedPassword)) {
-                   
-                    console.log("---------> Login Successful")
-                    console.log(password);
-                    console.log(hashedPassword);
-
-                    res.render('pages/welcome', {
-                        username: username,
-                        data: results,
-                    });
-                    //res.send(`${email} is logged in!`);
-
-
-                } else {
-                    console.log("---------> Password Incorrect")
-                    
-                    console.log(password);
-                    console.log(hashedPassword);
-                    //res.send("Password incorrect!")
-                    console.log('User/Password incorrect');
-                    req.flash('error', 'User/Password incorrect')
-                    res.render('/login');
-                }
-            }
-
-
-
-        });
-    };
-});*/
 
 app.get('/welcome', function (req, res) {
     res.render('pages/welcome');
@@ -199,6 +149,10 @@ app.post('/register', function (request, response) {
 
     if (name != undefined && username != undefined && password != undefined && email != undefined) {
         conexion.query('SELECT * FROM users WHERE email = ?', [email], function (error, results, fields) {
+            
+            if (error) {
+                throw error;
+            }
             console.log(results[0]);
             //console.log(error);
             if (results.length > 0) {
@@ -207,28 +161,37 @@ app.post('/register', function (request, response) {
                 response.send('This email already registered, try to login or try another email');
                 //response.redirect('/register');
                 response.end();
-            }  else { conexion.query('INSERT INTO users WHERE (name, username, email, password) VALUES (?,?,?,?)', [name, username, email, password], function (error, results, fields) {
+            }  else { conexion.query('INSERT INTO users (name, username, email, password) VALUES (?,?,?,?)', [name, username, email, password], function (error, results, fields) {
+                    
                     console.log(results[0]);
-                    //console.log(error);
-                    popup.alert({
-                        content: 'Register successfull'
-                    });
-                    response.render('pages/welcome', {
-                        username: username,
-                        data: results,
-                    });
-                    response.end();
+                    if (error) {
+                        throw error;
+                    }
+                    else{
+                        
+                        //console.log(error);
+                        //import alert from 'node-popup';
+                        //alert('Register successfull, please login');
+                        
+                        response.render('pages/login');
+                        response.end();
+                    }
                 });
             }
         });
-    }else {
-        popup.alert({
-            content: 'Please enter all the required data'
-        });
-        response.render('pages/welcome');
+    } else {
+       // import alert from 'node-popup';
+        //alert('Please enter all the required data');
+
+        response.render('pages/register');
         response.end();
     }
 });
+
+app.get('/login', function (req, res) {
+    res.render('pages/login');
+});
+
 
 app.listen(8080);
 console.log('listening on port 8080');
