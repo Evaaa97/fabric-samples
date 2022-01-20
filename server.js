@@ -160,6 +160,7 @@ app.post('/register', function (request, response) {
                 request.flash('error');
                 response.send('This email already registered, try to login or try another email');
                 //response.redirect('/register');
+                //window.alert("This email already registered, try to login or try another email");
                 response.end();
             }  else { conexion.query('INSERT INTO users (name, username, email, password) VALUES (?,?,?,?)', [name, username, email, password], function (error, results, fields) {
                     
