@@ -29,6 +29,20 @@ class AssetTransfer extends Contract {
                 Owner: 'Eva',
                 Trmperature: -22,
             },
+            {
+                ID: 'asset1',
+                Date: '12-01-2022',
+                Hour: '12:00',
+                Owner: 'Eva',
+                Trmperature: -24,
+            },
+            {
+                ID: 'asset2',
+                Date: '12-01-2022',
+                Hour: '12:10',
+                Owner: 'Eva',
+                Trmperature: -20,
+            },
         ];
 
         for (const asset of assets) {
