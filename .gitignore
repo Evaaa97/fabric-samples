@@ -10,4 +10,4 @@
 .DS_Store
 .project
 .idea
-node_modules
+*node_modules
