@@ -16,6 +16,47 @@
             <h1>Welcome <%= data[0].name%></h1>
             <p>Esta es la web para visualizar los datos de seguimiento de la conservacion de su pescado</p>
         </div>
+        <section class="box">
+            <label class="box-title" for="cb1">Your personal information</label>
+            <label class="box-close" for="acc-close"></label>
+            <div class="box-content">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <!--<th>Number of Transactions</th>-->
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Birthday</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="information">
+                        <% if (data) { %>
+                            <% for (var i=0; i < data.length; i++) { %>
+                                <tr>
+                                    <!--<td>
+                                    <%= (i+1) %>
+                                </td>-->
+                                    <td>
+                                        <%= data[i].nombre%>
+                                            <%= data[i].apellido%>
+                                    </td>
+                                    <td>
+                                        <%= data[i].email %>
+                                    </td>
+                                    <td>
+                                        <%= data[i].cumpleaños %>
+                                    </td>
+                                    <td>
+                                        <%= data[i].genero %>
+                                    </td>
+                                </tr>
+                                <% } %>
+                                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
     <footer>
