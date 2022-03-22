@@ -87,6 +87,11 @@ app.get('/login', function (req, res) {
     res.render('pages/login');
 });
 
+// graph page
+app.get('/graph', function (req, res) {
+    res.render('pages/graph');
+});
+
 app.post('/login', function (request, response) {
 
     const email = request.body.email;
