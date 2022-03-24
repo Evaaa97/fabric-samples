@@ -13,18 +13,18 @@
 
     <main>
         <div class="jumbotron">
-            <h1>Bienvenido <%= data[0].name%></h1>
-            <p>Esta es la web para visualizar los datos de seguimiento de la conservacion de su pescado</p>
+            <h1>¡Bienvenido! <%= data[0].name%></h1>
+            <p>En esta tabla puede visualizar los activos en seguimiento y todos sus datos</p>
         </div>
         <section class="box">
-            <label class="box-title" for="cb1">Información de assets</label>
+            <label class="box-title" for="cb1">Información de activos</label>
             <label class="box-close" for="acc-close"></label>
             <div class="box-content">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
                             <!--<th>Number of Transactions</th>-->
-                            <th>Asset</th>
+                            <th>Activo</th>
                             <th>Fecha</th>
                             <th>Temperatura</th>
                         </tr>
@@ -38,14 +38,13 @@
                                     <%= (i+1) %>
                                 </td>-->
                                     <td>
-                                        <%= data[i].nombre%>
-                                            <%= data[i].apellido%>
+                                        <%= data[i].name%>
                                     </td>
                                     <td>
                                         <%= data[i].email %>
                                     </td>
                                     <td>
-                                        <%= data[i].cumpleaños %>
+                                        <%= data[i].username %>
                                     </td>
                                 </tr>
                                 <% } %>
