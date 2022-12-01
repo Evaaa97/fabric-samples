@@ -39,7 +39,6 @@ app.use(express.static('public'));
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
-let mysql = require('mysql');
 const session = require('express-session');
 var bodyParser = require('body-parser');
 var path = require('path');
@@ -55,6 +54,8 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }));
+
+var mysql = require('mysql');
 var conexion = mysql.createConnection({
     host: 'localhost',
     database: 'web_db',
