@@ -59,7 +59,7 @@ var conexion = mysql.createConnection({
     host: 'localhost',
     database: 'web_db',
     user: 'root',
-    password: '123456789',
+    password: '1234',
 });
 
 conexion.connect(function (err) {
