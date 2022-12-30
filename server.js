@@ -142,6 +142,22 @@ app.get('/welcome', function (req, res) {
     res.render('pages/welcome');
 });
 
+app.post('/welcome', function (request, response) {
+
+    const id = request.body.id;
+    
+    conexion.query('SELECT * FROM Datos WHERE id = ? ', [id], function (error, results, fields) {
+        console.log('patata');
+        if (error) {
+        throw error;
+        }
+        
+        else if (results[0].id == id) {
+            
+        }
+    });
+});
+
 // register page
 app.get('/register', function (req, res) {
     res.render('pages/register');
@@ -198,6 +214,7 @@ app.post('/register', function (request, response) {
 app.get('/login', function (req, res) {
     res.render('pages/login');
 });
+
 
 
 app.listen(8080);
