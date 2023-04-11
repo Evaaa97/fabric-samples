@@ -144,18 +144,10 @@ app.get('/welcome', function (req, res) {
 
 app.post('/welcome', function (request, response) {
 
-    const id = request.body.id;
-    
-    conexion.query('SELECT * FROM Datos WHERE id = ? ', [id], function (error, results, fields) {
-        console.log('patata');
-        if (error) {
-        throw error;
-        }
-        
-        else if (results[0].id == id) {
-            
-        }
-    });
+    var columns =  ['ID', 'Temperature', 'Time'];
+    var table = 'Datos';
+    var id = 'ID';
+
 });
 
 // register page
